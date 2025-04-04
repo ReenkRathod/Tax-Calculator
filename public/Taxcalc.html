@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            line-height: 1.6;
+            color: #333;
+            padding-top: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin: 30px 0;
+            color: #2c3e50;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .calculator-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin: 40px 0;
+            transition: transform 0.3s;
+        }
+        
+        .calculator-container:hover {
+            transform: translateY(-5px);
+        }
+        
+        .calculator-form {
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            background-color: #fff;
+        }
+        
+        .form-control.error {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 8px;
+            display: block;
+            font-weight: 500;
+        }
+        
+        .calculate-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 10px auto;
+            min-width: 200px;
+            box-shadow: 0 4px 6px rgba(52, 152, 219, 0.3);
+        }
+        
+        .calculate-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.4);
+        }
+        
+        .calculate-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(52, 152, 219, 0.4);
+        }
+        
+        .tax-rate-info {
+            margin-top: 15px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            background-color: #ebf5fb;
+            border-radius: 0 8px 8px 0;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tax-period-description {
+            font-style: italic;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .result-container {
+            background-color: #f1f8fe;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 40px;
+            border-top: 5px solid #3498db;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-container h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+        
+        .tax-period-note {
+            background-color: #e8f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .result-item {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .result-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        
+        .result-item h3 {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .result-item p {
+            color: #2c3e50;
+            font-size: 26px;
+            font-weight: 700;
+        }
+        
+        .footer {
+            background-color: #2c3e50;
+            color: white;
+            padding-top: 50px;
+            margin-top: 60px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .footer h3, .footer h4 {
+            margin-bottom: 20px;
+            color: #3498db;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .footer-info p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        .developer-name {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #3498db;
+        }
+        
+        .developer-details {
+            color: #ecf0f1;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            padding: 2px 0;
+        }
+        
+        .footer-links a:hover {
+            color: #3498db;
+            transform: translateX(5px);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+            border-top: 1px solid #34495e;
+            font-size: 14px;
+        }
+        
+        /* Additional enhancements */
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+            padding-right: 2.5rem;
+        }
+        
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { 
+            opacity: 1;
+            height: 30px;
+            margin-right: 5px;
+        }
+        
+        /* Highlight effect for result items */
+        .result-item:nth-child(1) { border-top: 3px solid #3498db; }
+        .result-item:nth-child(2) { border-top: 3px solid #e74c3c; }
+        .result-item:nth-child(3) { border-top: 3px solid #2ecc71; }
+        .result-item:nth-child(4) { border-top: 3px solid #f39c12; }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            background-color: #2c3e50;
+            color: white;
+            margin-bottom: 20px;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h2 {
+            font-size: 1.8rem;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        
+        @media (max-width: 768px) {
+            .calculator-container {
+                padding: 25px 20px;
+            }
+            
+            .result-item {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <main class="container">
+        <h1>Calculate Your Taxes</h1>
+        
+        <div class="calculator-container">
+            <form id="taxCalculatorForm" class="calculator-form">
+                <div class="form-group">
+                    <label for="income">Annual Income (Rs.)</label>
+                    <input type="number" id="income" class="form-control" placeholder="Enter your annual income">
+                    <span class="error-message" id="incomeError"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="year">Tax Year</label>
+                    <select id="year" class="form-control">
+                    </select>
+                    <span class="error-message" id="yearError"></span>
+                    
+                    <div class="tax-rate-info" id="taxRateInfo" style="display: none;">
+                        <p>Tax Rate for <span id="selectedYear"></span>: <strong><span id="taxRate"></span>%</strong></p>
+                        <p class="tax-period-description" id="taxRateDescription"></p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deductions">Deductions (Rs.)</label>
+                    <input type="number" id="deductions" min="0" class="form-control" placeholder="Enter deductible amount">
+                </div>
+                
+                <button type="submit" class="calculate-btn">Calculate Tax</button>
+            </form>
+            
+            <div class="result-container" id="resultContainer" style="display: none;">
+                <h2>Tax Calculation Results for <span id="resultYear"></span></h2>
+                <div class="tax-period-note">
+                    <p>Applied Tax Rate: <strong><span id="appliedRate"></span>%</strong></p>
+                    <p><em id="periodDescription"></em></p>
+                </div>
+                <div class="result-grid">
+                    <div class="result-item">
+                        <h3>Taxable Income</h3>
+                        <p>Rs.<span id="taxableIncome"></span></p>
+                    </div>
+                    <div class="result-item">
+                        <h3>Tax Amount</h3>
+                        <p>Rs.<span id="taxAmount"></span></p>
+                    </div>
+                    <div class="result-item">
+                        <h3>Net Income</h3>
+                        <p>Rs.<span id="netIncome"></span></p>
+                    </div>
+                    <div class="result-item">
+                        <h3>Effective Tax Rate</h3>
+                        <p><span id="effectiveTaxRate"></span>%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-info">
+                <h3>Tax Calculator</h3>
+                <p>A simple tool to calculate your taxes with ease</p>
+            </div>
+            
+            <div class="footer-developer">
+                <h4>Developed By</h4>
+                <p class="developer-name">Reenk Rathod</p>
+                <p class="developer-details">Registration No: 23bkt0054</p>
+                <p class="developer-details">Email: rathodreenk.mitesh2023@vitstudent.ac.in</p>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="Contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; <span id="currentYear"></span> Tax Calculator. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        
+        const taxPeriods = {
+            '2020-2024': {
+                rate: 22,
+                description: 'Standard rate for 2020-2024 period',
+            },
+            '2025-2029': {
+                rate: 24,
+                description: 'Increased rate due to economic policy changes',
+            },
+            '2030-2034': {
+                rate: 20,
+                description: 'Reduced rate to stimulate economic growth',
+            },
+            '2035-2039': {
+                rate: 25,
+                description: 'Higher rate to address national debt',
+            },
+            '2040-2044': {
+                rate: 18,
+                description: 'Lowest rate due to economic prosperity',
+            },
+        };
+
+        const taxCalculatorForm = document.getElementById('taxCalculatorForm');
+        const yearSelect = document.getElementById('year');
+        const incomeInput = document.getElementById('income');
+        const deductionsInput = document.getElementById('deductions');
+        const taxRateInfo = document.getElementById('taxRateInfo');
+        const resultContainer = document.getElementById('resultContainer');
+        const currentYearSpan = document.getElementById('currentYear');
+
+        currentYearSpan.textContent = new Date().getFullYear();
+        
+        function generateYearOptions() {
+            for (let year = 2020; year <= 2044; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                
+                if (year === 2025) {
+                    option.selected = true;
+                }
+                
+                yearSelect.appendChild(option);
+            }
+        }
+        
+        function updateTaxRateInfo(year) {
+            const yearNum = parseInt(year);
+            let foundPeriod = null;
+            
+            for (const period in taxPeriods) {
+                const [start, end] = period.split('-').map(str => parseInt(str));
+                if (yearNum >= start && yearNum <= end) {
+                    foundPeriod = period;
+                    break;
+                }
+            }
+            
+            if (foundPeriod) {
+                document.getElementById('selectedYear').textContent = year;
+                document.getElementById('taxRate').textContent = taxPeriods[foundPeriod].rate;
+                document.getElementById('taxRateDescription').textContent = taxPeriods[foundPeriod].description;
+                taxRateInfo.style.display = 'block';
+                return taxPeriods[foundPeriod];
+            }
+            
+            taxRateInfo.style.display = 'none';
+            return null;
+        }
+        
+        taxCalculatorForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            document.getElementById('incomeError').textContent = '';
+            document.getElementById('yearError').textContent = '';
+            
+            let isValid = true;
+            
+            if (!incomeInput.value) {
+                document.getElementById('incomeError').textContent = 'Income is required';
+                incomeInput.classList.add('error');
+                isValid = false;
+            } else {
+                incomeInput.classList.remove('error');
+            }
+            
+            if (!yearSelect.value) {
+                document.getElementById('yearError').textContent = 'Year is required';
+                yearSelect.classList.add('error');
+                isValid = false;
+            } else {
+                yearSelect.classList.remove('error');
+            }
+            
+            if (!isValid) return;
+
+            const taxRateInfo = updateTaxRateInfo(yearSelect.value);
+            
+            const incomeValue = parseFloat(incomeInput.value);
+            const taxRateValue = taxRateInfo ? taxRateInfo.rate : 22; 
+            const deductionsValue = deductionsInput.value ? parseFloat(deductionsInput.value) : 0;
+            
+            const taxableIncome = Math.max(0, incomeValue - deductionsValue);
+            
+            const taxAmount = taxableIncome * (taxRateValue / 100);
+            
+            const netIncome = incomeValue - taxAmount;
+            
+            const effectiveTaxRate = ((taxAmount / incomeValue) * 100).toFixed(2);
+            
+            document.getElementById('resultYear').textContent = yearSelect.value;
+            document.getElementById('appliedRate').textContent = taxRateValue;
+            document.getElementById('periodDescription').textContent = taxRateInfo ? taxRateInfo.description : '';
+            document.getElementById('taxableIncome').textContent = taxableIncome.toFixed(2);
+            document.getElementById('taxAmount').textContent = taxAmount.toFixed(2);
+            document.getElementById('netIncome').textContent = netIncome.toFixed(2);
+            document.getElementById('effectiveTaxRate').textContent = effectiveTaxRate;
+            
+            resultContainer.style.display = 'block';
+            
+            // Smooth scroll to results
+            setTimeout(() => {
+                resultContainer.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        });
+        
+        generateYearOptions();
+        updateTaxRateInfo(yearSelect.value);
+        
+        yearSelect.addEventListener('change', function() {
+            updateTaxRateInfo(this.value);
+        });
+    </script>
+</body>
+</html>
